@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
+  <head>
+    <meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>
+    <title>Real time ASCII Raytracer in Javascript</title>
+    <style type="text/css">
+    #screen {
+        font-family: 'courier, monospace';
+        font-size: 8pt;
+        font-weight: normal;
+        line-height: 0.5em;
+        letter-spacing: -50%;
+    }
+    </style>
+  </head>
+  <body>
+    <h2>Javascript ASCII Raytracing</h2>
+    <div>
+      <label for='width'>Width</label>
+      <input type='text' name='width' id='width' size='3' value='100'/>
+      <label for='height'>Height</label>
+      <input type='text' name='height' id='height' size='3' value='80'/>
+      <button onclick='render()'>Render!</button>
+      <button onclick='stop()'>Stop!</button>
+      <div id='camera'></div>
+    </div>
+    <div id='zone'></div>
+    <pre id='log'></pre>
+    <div id='screen'>
+    </div>
+  </body>
+  <script src='http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js' type='text/javascript'></script>
+  <script src='asciitracer.js' type='text/javascript' charset='utf-8'></script>
+  <script type='text/javascript'>
+    var interval=null;
+    function log (str) {
+        document.getElementById("log").textContent += str + "\n";
+    }
+    function stop() {
+        if (interval) {
+            clearInterval(interval);
+        }
+    }
+    function render () {
+        stop();
+        var w = document.getElementById("width").value,
+            h = document.getElementById("height").value,
+            zone = document.getElementById("zone");
+
+        cameraDiv = document.getElementById('camera');
+        var camera_velocities = [
+            [0, 0, -1, 35],
+            [-1, 0, 0, 30],
+            [0, 0, 1, 35],
+            [1, 0, 0, 30],
+            [0.3, 0.3, 0, 5],
+        ];
+        var vel_idx = 0;
+        var frame = 0; 
+      
+        interval = setInterval(function() {
+            scene.camera.position = AsciiTracer.vectorAdd(scene.camera.position, AsciiTracer.vectorScale(camera_velocities[vel_idx], 0.2));
+            //cameraDiv.innerHTML = camera_velocities[vel_idx] + " vel_idx = " + vel_idx + ", frame: " + frame;
+            
+            AsciiTracer.traceTo(zone, w, h, scene);
+            frame++;
+            if (frame == camera_velocities[vel_idx][3]) {
+                vel_idx = (vel_idx + 1) % camera_velocities.length;
+                frame = 0;
+            }
+        }, 1);
+
+    }
+    var scene = {
+        background: 0.6,
+        shapes:     [
+           {    // checkerboard plane
+                id:       0,
+                type:     0,  // plane
+                offset:   0,
+                surface:  1, // checkerboard
+                normal: [0, 1, 0]
+            },
+            {   // big sphere
+                id:       2,
+                type:     1, // sphere
+                radius:   1,
+                surface:  0, // shiny
+                centre:   [0, 1.0, 0],
+            },
+            {    // sphere
+                id:       3,
+                type:     1,
+                radius:   0.5,
+                surface:  0,
+                centre:   [-1, 0.5, 1.5],
+            },
+        ],
+        camera: {
+            position: [3, 0.2, 4], 
+            lookAt:   [-1, 0.5, 0],
+        },
+        lights: [
+        /*
+            {
+                position: [-2, 2.5, 0],
+                //color:   [0.49, 0.07, 0.07]
+                color: [0.5, 0.5, 0.5]
+            },
+            */
+            {
+                position: [0.0, 7.0, 0.0],
+                color: 1.0,
+            },
+            {
+                position: [1.5, 2.5, 1.5],
+                color: 1.0,
+            },
+            /*
+            {
+                position: [1.5, 2.5, -1.5],
+                //color:   [0.07, 0.49, 0.07]
+                color: [0.5, 0.5, 0.5]
+            },
+            */
+            /*
+            {
+                position: [0, 3.5, 0],
+                color:   [0.21, 0.21, 0.35]
+            },
+            */
+        ]
+    };
+  </script>
+</html>
