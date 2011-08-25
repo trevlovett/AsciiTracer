@@ -121,16 +121,26 @@
             };
         },
         intersectPlane:    function (start, dir, plane) {
-            var denom = this.vectorDot(dir, plane.normal);
+            var denom = dir[0]*plane.normal[0] + dir[1]*plane.normal[1] + dir[2]*plane.normal[2]; //this.vectorDot(dir, plane.normal);
             if (denom == 0) return;
-            var res = plane.offset - this.vectorDot(start, plane.normal) / denom;
+            //var res = plane.offset - this.vectorDot(start, plane.normal) / denom;
+            var res = plane.offset - (start[0]*plane.normal[0] + start[1]*plane.normal[1] + start[2]*plane.normal[2]) / denom;
             if (res <= 0) return;
             return res;
         },
         intersectSphere:    function (start, dir, sphere) {
+            /*
             var y = this.vectorSub(start, sphere.centre);
             var beta = this.vectorDot(dir, y),
                 gamma = this.vectorDot(y, y) - sphere.radius * sphere.radius;
+            */
+            var y = [];
+            y[0] = start[0] - sphere.centre[0];
+            y[1] = start[1] - sphere.centre[1];
+            y[2] = start[2] - sphere.centre[2];
+            var beta = dir[0]*y[0] + dir[1]*y[1] + dir[2]*y[2];
+            var gamma = y[0]*y[0] + y[1]*y[1] + y[2]*y[2] - sphere.radius*sphere.radius;
+
             var descriminant = beta * beta - gamma;
             if (descriminant <= 0) return;
             var sqrt = Math.sqrt(descriminant);
@@ -149,15 +159,28 @@
             };
         },
         sphereNormal:    function (pos, sphere) {
-            return this.vectorScale(this.vectorSub(pos, sphere.centre), 1/sphere.radius);
+            //return this.vectorScale(this.vectorSub(pos, sphere.centre), 1/sphere.radius);
+            var fact = 1.0 / sphere.radius;
+            return [fact*(pos[0] - sphere.centre[0]), fact*(pos[1] - sphere.centre[1]), fact*(pos[2] - sphere.centre[2])];
         },
 	    shade:    function (pos, dir, shape, scene, contrib) {
             var mat = this.material(shape.surface, pos);
             var norm = this.shapeNormal(pos, shape);
             var reflect = mat[1];
+            var dirDotNorm = dir[0]*norm[0] + dir[1]*norm[1] + dir[2]*norm[2];
+            var _2dirDotNorm = 2*dirDotNorm;
+
             contrib = contrib * reflect;
-            norm = (this.vectorDot(dir, norm) > 0) ? -norm : norm;
-            var reflectDir = this.vectorSub(dir, this.vectorScale(norm, 2 * this.vectorDot(norm, dir)));
+
+            //norm = (this.vectorDot(dir, norm) > 0) ? -norm : norm;
+            norm = (dirDotNorm > 0) ? -norm: norm;
+
+            //var reflectDir = this.vectorSub(dir, this.vectorScale(norm, 2 * this.vectorDot(norm, dir)));
+            var reflectDir = [];
+            reflectDir[0] = dir[0] - _2dirDotNorm*norm[0];
+            reflectDir[1] = dir[1] - _2dirDotNorm*norm[1];
+            reflectDir[2] = dir[2] - _2dirDotNorm*norm[2];
+
             var light = this.light(scene, shape, pos, norm, reflectDir, mat);
             if (contrib > 0.1) { // 0.01
                 return light + reflect * this.traceRay(scene, pos, reflectDir, shape, contrib);
