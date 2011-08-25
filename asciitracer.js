@@ -217,9 +217,9 @@
                     }
                 }
                 if (skip) continue;
-                var illum = this.vectorDot(lDir, norm);
+                var illum = lDir[0]*norm[0] + lDir[1]*norm[1] + lDir[2]*norm[2]; //this.vectorDot(lDir, norm);
                 if (illum > 0) res += lCol * color * illum; 
-                var spec = this.vectorDot(lDir, reflectDir);
+                var spec = lDir[0]*reflectDir[0] + lDir[1]*reflectDir[1] + lDir[2]*reflectDir[2]; //this.vectorDot(lDir, reflectDir);
                 if (spec > 0) res += lCol * Math.pow(spec, smooth) * reflect; 
             }
             return res;
@@ -252,7 +252,8 @@
                 if (ignore && ignore.id == shape.id) continue;
                 var dist = this.shapeIntersect(src, dir, shape);
                 if (dist == null) continue; // XXX optimisation
-                var pos = this.vectorAdd(src, this.vectorScale(dir, dist));
+                //var pos = this.vectorAdd(src, this.vectorScale(dir, dist));
+                var pos = [src[0] + dist*dir[0], src[1] + dist*dir[1], src[2] + dist*dir[2]];
                 tmp.push({dist: dist, pos: pos, shape: shape});
             }
             if (tmp.length == 0) return scene.background;
