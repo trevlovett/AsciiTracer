@@ -6,7 +6,7 @@
                 <link rel='stylesheet' type='text/css' href='reset.css' />
                 <link rel='stylesheet' type='text/css' href='css/slider.css' />
                 <style type='text/css'>
-                        body 
+                        body
                         {
                                 font-family: Helvetica, Arial, Sans-serif;
                                 font-size: 10pt;
@@ -15,41 +15,41 @@
                                 margin-left: 30px;
                         }
 
-                        h2 
+                        h2
                         {
                                 font-size: 14pt;
                                 font-weight: bold;
                         }
-                        
-                        #screen 
+
+                        #screen
                         {
-                                font-family: Courier New, monospace;
+                                font-family: Courier New, Monospace;
                                 font-size: 6pt;
                                 font-weight: normal;
                                 position: relative;
                                 top: -4px;
                         }
-                        
+
                         #width, #height
                         {
                                 width: 45px;
                         }
-                        
+
                         #width, #height, #fps
                         {
                                 border: 1px solid #888;
                                 background-color: #ffc;
                                 padding: 2px;
                         }
-                        
-                        .slider 
+
+                        .slider
                         {
                                 width: 600px;
                                 font-family: Helvetica, Arial, sans-serif;
                                 font-size: 12px;
                         }
-                        
-                        .tooltip 
+
+                        .tooltip
                         {
                                 display: none;
                                 background: transparent url(images/black_arrow.png);
@@ -57,13 +57,9 @@
                                 height: 70px;
                                 width: 160px;
                                 padding: 25px;
-                                color: #fff;	
+                                color: #fff;
                         }
                 </style>
-                <script src='js/jquery-1.6.2.min.js' type='text/javascript'></script>
-                <script src='js/jquery.tools.min.js' type='text/javascript'></script>
-                <script src='js/slider.js' type='text/javascript'></script>
-                <script src='asciitracer.js' type='text/javascript' charset='utf-8'></script>
         </head>
         <body>
                 <p>&nbsp;</p>
@@ -104,11 +100,11 @@
                                 </td>
                         </tr>
                 </table>
-                <div>
-                </div>
-                <div id='zone'></div>
-                <pre id='log'></pre>
         </body>
+        <script src='js/jquery-1.6.2.min.js' type='text/javascript'></script>
+        <script src='js/jquery.tools.min.js' type='text/javascript'></script>
+        <script src='js/slider.js' type='text/javascript'></script>
+        <script src='asciitracer.js' type='text/javascript' charset='utf-8'></script>
         <script type='text/javascript'>
                 var interval=null;
 
@@ -125,7 +121,7 @@
                                 },
 
                                 {   // big sphere
-                                        id:       2,
+                                        id:       1,
                                         type:     1, // sphere
                                         radius:   1,
                                         surface:  0, // shiny
@@ -133,15 +129,15 @@
                                 },
 
                                 {    // sphere
-                                        id:       3,
+                                        id:       2,
                                         type:     1,
                                         radius:   0.5,
-                                        surface:  0,
+                                        surface:  0, // shiny
                                         centre:   [-1, 0.5, 1.5],
-                                },
+                                }
                         ],
 
-                        camera: 
+                        camera:
                         {
                                 position: [3, 0.2, 4],
                                 lookAt:   [-1, 0.5, 0],
@@ -151,40 +147,29 @@
                                 {
                                         position: [0.0, 7.0, 0.0],
                                         luma: 1.0,
-                                },
+                                }
                         ]
                 };
 
                 var g_LastTime = new Date();
-                
-                var Keys = 
-                {
-                        left: 0,
-                        right: 1,
-                        up: 2,
-                        down: 3,
-                        space: 4,
-                        
-                        count: 5
-                };
 
                 function set_button_state(id, state)
                 {
                         var target = $('#' + id);
-                        
+
                         if(state)
                                 target.removeAttr('disabled');
                         else
                                 target.attr('disabled', 'disabled');
                 }
-                
+
                 function set_render_state(state)
                 {
-                        set_button_state('start-button', !state); 
-                        set_button_state('stop-button', state); 
+                        set_button_state('start-button', !state);
+                        set_button_state('stop-button', state);
                 }
-                
-                function stop() 
+
+                function stop()
                 {
                         if(interval)
                         {
@@ -193,17 +178,17 @@
                         }
                 }
 
-                function start() 
+                function start()
                 {
                         stop();
 
                         var w = document.getElementById('width').value;
                         var h = document.getElementById('height').value;
-                        var zone = document.getElementById('zone');
+                        var fpsDiv = $('#fps');
 
                         AsciiTracer.init(w, h);
-                        
-                        cameraDiv = document.getElementById('camera');
+
+                        fpsDiv.html('&nbsp;0.00&nbsp;');
 
                         var camera_velocities = [
                                 [0, 0, -1, 35],
@@ -214,60 +199,61 @@
                         ];
 
                         var vel_idx = 0;
-                        var frame = 0; 
+                        var frame = 0;
 
-                        interval = setInterval(function() 
+                        interval = setInterval(function()
                         {
                                 if(typeof AsciiTracer === 'undefined')
                                         return;
-                                
+
                                 // Update FPS
                                 var time = new Date();
                                 var delta_t = (time - g_LastTime) / 1000.0;
                                 var fps = 1000.0 / (time - g_LastTime);
-                                
+
                                 g_LastTime = time;
-                                
-                                $('#fps').html('&nbsp;' + fps.toFixed(2) + '&nbsp;');
+
+                                fpsDiv.html('&nbsp;' + fps.toFixed(2) + '&nbsp;');
 
                                 scene.camera.position = AsciiTracer.vectorAdd(scene.camera.position, AsciiTracer.vectorScale(camera_velocities[vel_idx], 0.2));
-                                AsciiTracer.traceTo(zone, w, h, scene);
+                                AsciiTracer.traceTo(w, h, scene);
+
                                 frame++;
 
-                                if (frame == camera_velocities[vel_idx][3]) 
+                                if (frame == camera_velocities[vel_idx][3])
                                 {
                                         vel_idx = (vel_idx + 1) % camera_velocities.length;
                                         frame = 0;
                                 }
                         }, 1);
-                        
+
                         set_render_state(true);
                 }
-                
-                $(document).ready(function() 
+
+                $(document).ready(function()
                 {
                         set_render_state(false);
-                        
+
                         $("[title]").tooltip();
-                        
+
                         var w = document.getElementById('width').value;
                         var h = document.getElementById('height').value;
 
                         AsciiTracer.init(w, h);
 
-                        new Slider('slider-aa', 
+                        new Slider('slider-aa',
                         {
                                 steps: 2,
                                 snapping: true,
-                                animation_callback: function(value) 
+                                animation_callback: function(value)
                                 {
                                         AsciiTracer.setAntiAlias(value);
                                 }
                         });
-                        
-                        new Slider('slider-motion-blur', 
+
+                        new Slider('slider-motion-blur',
                         {
-                                animation_callback: function(value) 
+                                animation_callback: function(value)
                                 {
                                         AsciiTracer.setMotionBlur(value);
                                 }
