@@ -196,23 +196,50 @@ var AsciiTracer =
                 var reflect = null;
                 var smooth = null;
 
-                if(shape.surface == 0)
+                switch(shape.surface) 
                 {
+                    case 0:
                         luma = 1;
                         reflect = 0.63;
                         smooth = 100;
-                }
-                else if(Math.abs(pos[0]) < 10 && Math.abs(pos[2]) < 10 && (Math.round(pos[0]) + Math.round(pos[2])) % 2 == 0)
-                {
-                        luma = 1;
-                        reflect = 0;
-                        smooth = 0;
-                }
-                else
-                {
-                        luma = 0;
-                        reflect = 0;
-                        smooth = 0;
+                        break;
+                    case 2:
+                        var r = [pos[0] - shape.centre[0], pos[1] - shape.centre[1], pos[2] - shape.centre[2]];
+                        var r_fact = 1.0 / shape.radius; 
+
+                        // sphere
+                        if (shape.type == 1 && shape.textureBuffer) 
+                        {
+                            var u = r[0] * r_fact;
+                            var v = r[1] * r_fact;
+                            var u_off = Math.floor(u * shape.textureWidth);
+                            var v_off = Math.floor(v * shape.textureHeight);
+                            
+                            luma = shape.textureBuffer[v_off*shape.textureWidth + u_off] / 255;
+
+                            reflect = 0.0
+                            smooth = 0;
+                            break;
+                        }
+                        // plane
+                        else if (shape.type == 0) 
+                        {
+                           // TODO plane tex mapping 
+                           break;
+                        }
+                    case 1:
+                        if(Math.abs(pos[0]) < 10 && Math.abs(pos[2]) < 10 && (Math.round(pos[0]) + Math.round(pos[2])) % 2 == 0)
+                        {
+                            luma = 1;
+                            reflect = 0;
+                            smooth = 0;
+                        }
+                        else {
+                            luma = 0;
+                            reflect = 0;
+                            smooth = 0;
+                        }
+                        break;
                 }
                 
                 var norm = shape.type == 0 ? shape.normal : shape.type == 1 ? this.vectorScale(this.vectorSub(pos, shape.centre), 1.0 / shape.radius) : [0, 0, 0];
