@@ -212,13 +212,14 @@ var AsciiTracer =
                         {
                             var u = r[0] * r_fact;
                             var v = r[1] * r_fact;
-                            var u_off = Math.floor(u * shape.textureWidth);
-                            var v_off = Math.floor(v * shape.textureHeight);
-                            
-                            luma = shape.textureBuffer[v_off*shape.textureWidth + u_off] / 255;
 
-                            reflect = 0.0
-                            smooth = 0;
+                            // adding width and height to take care of neg (u, v) coords
+                            var u_off = Math.floor(shape.textureWidth + u * shape.textureWidth) % shape.textureWidth;
+                            var v_off = Math.floor(shape.textureHeight + v * shape.textureHeight) % shape.textureHeight;
+                            var offset = v_off*shape.textureWidth + u_off;
+                            
+                            // TODO: store textures as float arrays
+                            luma = shape.textureBuffer[offset] / 255;
                             break;
                         }
                         // plane

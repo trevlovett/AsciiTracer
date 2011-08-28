@@ -141,7 +141,7 @@
                                         radius:   1,
                                         surface:  2, // texture
                                         centre:   [0, 1.0, 0],
-                                        textureBuffer: spots,
+                                        textureBuffer: perlin,
                                         textureWidth: 64,
                                         textureHeight: 64,
                                 },
@@ -163,16 +163,20 @@
 
                         lights: [
                                 {
-                                        position: [0.0, 7.0, 0.0],
-                                        luma: 1.0,
+                                    position: [0.0, 7.0, 0.0],
+                                    luma: 1.0,
                                 },
                                 {
                                     position: [7.0, 1.0, 0.0],
-                                    luma: 1.0,
+                                    luma: 0.5,
                                 },
                                 {
                                     position: [0.0, 1.0, 7.0],
-                                    luma: 1.0,
+                                    luma: 0.5,
+                                },
+                                {
+                                    position: [0.0, 1.0, -7.0],
+                                    luma: 0.5,
                                 }
                         ]
                 };
