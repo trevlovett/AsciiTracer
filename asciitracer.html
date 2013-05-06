@@ -208,10 +208,12 @@
 
                         $('body').mousemove(function(e) {
                             if (e.pageX < mouse_x) {
-                              angle_dx += 0.0005;
+                              //angle_dx += 0.0005;
+                              angle += 0.05;
                             }
                             else if (e.pageX > mouse_x) {
-                              angle_dx -= 0.0005;
+                              //angle_dx -= 0.0005;
+                              angle -= 0.05;
                             }
                             mouse_x = e.pageX;
                         });
@@ -220,12 +222,12 @@
                             console.log(e.which);
                             switch(e.which) {
                               case 119:
-                                speed_d += 0.001;
+                                speed = 0.01;
                               break;
                               case 97:
                               break;
                               case 115:
-                                speed_d -= 0.0001;
+                                speed = -0.01;
                               break;
                               case 100:
                               break;
@@ -251,10 +253,7 @@
                                 scene.camera.position = AsciiTracer.vectorAdd(scene.camera.position, AsciiTracer.vectorScale(rot_eye_vec, speed));
                                 AsciiTracer.traceTo(w, h, scene);
                                 angle += angle_dx;
-                                speed += speed_d;
-                                if (speed > 0.1) {
-                                  speed = 0.1;
-                                }
+                                speed *= 0.90;
 
                         }, 1);
 
