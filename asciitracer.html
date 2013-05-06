@@ -116,10 +116,18 @@
                                         id:       0,
                                         type:     0,  // plane
                                         offset:   0,
-                                        surface:  1, // checkerboard
+                                        surface:  1, 
                                         normal: [0, 1, 0]
                                 },
-
+                          /*
+                                {    // checkerboard plane
+                                        id:       0,
+                                        type:     0,  // plane
+                                        offset:   25,
+                                        surface:  0, // checkerboard
+                                        normal: [1, 0, 0]
+                                },
+                            */
                                 {   // big sphere
                                         id:       1,
                                         type:     1, // sphere
@@ -140,13 +148,13 @@
                         camera:
                         {
                                 position: [3, 0.2, 4],
-                                lookAt:   [-1, 0.5, 0],
+                                lookAt:   [4, 0.2, 4],
                         },
 
                         lights: [
                                 {
                                         position: [0.0, 7.0, 0.0],
-                                        luma: 1.0,
+                                        luma: 0.5,
                                 }
                         ]
                 };
@@ -190,16 +198,39 @@
 
                         fpsDiv.html('&nbsp;0.00&nbsp;');
 
-                        var camera_velocities = [
-                                [0, 0, -1, 35],
-                                [-1, 0, 0, 30],
-                                [0, 0, 1, 35],
-                                [1, 0, 0, 30],
-                                [0.3, 0.3, 0, 25],
-                        ];
+                        eye_vector = [1, 0, 0]
+                        speed = 0;
+                        speed_d = 0;
+                        angle = 0;
+                        angle_dx = 0;
+                        mouse_x = 0;
+                        mouse_y = 0;
 
-                        var vel_idx = 0;
-                        var frame = 0;
+                        $('body').mousemove(function(e) {
+                            if (e.pageX < mouse_x) {
+                              angle_dx += 0.0005;
+                            }
+                            else if (e.pageX > mouse_x) {
+                              angle_dx -= 0.0005;
+                            }
+                            mouse_x = e.pageX;
+                        });
+
+                        $('body').keypress(function(e) {
+                            console.log(e.which);
+                            switch(e.which) {
+                              case 119:
+                                speed_d += 0.001;
+                              break;
+                              case 97:
+                              break;
+                              case 115:
+                                speed_d -= 0.0001;
+                              break;
+                              case 100:
+                              break;
+                            }
+                        });
 
                         interval = setInterval(function()
                         {
@@ -215,16 +246,16 @@
 
                                 fpsDiv.html('&nbsp;' + fps.toFixed(2) + '&nbsp;');
 
-                                scene.camera.position = AsciiTracer.vectorAdd(scene.camera.position, AsciiTracer.vectorScale(camera_velocities[vel_idx], 0.2));
+                                rot_eye_vec = AsciiTracer.vectorRotateXY(eye_vector, angle);
+                                scene.camera.lookAt = AsciiTracer.vectorAdd(scene.camera.position, rot_eye_vec);
+                                scene.camera.position = AsciiTracer.vectorAdd(scene.camera.position, AsciiTracer.vectorScale(rot_eye_vec, speed));
                                 AsciiTracer.traceTo(w, h, scene);
-
-                                frame++;
-
-                                if (frame == camera_velocities[vel_idx][3])
-                                {
-                                        vel_idx = (vel_idx + 1) % camera_velocities.length;
-                                        frame = 0;
+                                angle += angle_dx;
+                                speed += speed_d;
+                                if (speed > 0.1) {
+                                  speed = 0.1;
                                 }
+
                         }, 1);
 
                         set_render_state(true);

@@ -124,6 +124,14 @@ var AsciiTracer =
                 return [v1[0]-v2[0], v1[1]-v2[1], v1[2]-v2[2]];
         },
 
+        vectorRotateXY: function(v, theta)
+        {
+                return [v[0] * Math.cos(theta) - v[2] * Math.sin(theta),
+                        v[1],
+                        v[0] * Math.sin(theta) + v[2] * Math.cos(theta)]
+
+        },
+
         vectorScale: function(v1, x)
         {
                 return [v1[0]*x, v1[1]*x, v1[2]*x];
@@ -221,7 +229,8 @@ var AsciiTracer =
                         reflect = 0.63;
                         smooth = 100;
                 }
-                else if(Math.abs(pos[0]) < 10 && Math.abs(pos[2]) < 10 && (Math.round(pos[0]) + Math.round(pos[2])) % 2 == 0)
+                // TODO: make constant for max plane size
+                else if((Math.round(pos[0]) + Math.round(pos[2]) + Math.round(pos[1])) % 2 == 0)
                 {
                         luma = 1;
                         reflect = 0;
